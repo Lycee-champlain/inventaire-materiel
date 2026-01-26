@@ -268,6 +268,25 @@
             background: rgba(15, 76, 129, 0.02);
         }
 
+        .scanner-tips {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(5, 150, 105, 0.1);
+            border-radius: 8px;
+            text-align: left;
+            border-left: 4px solid var(--success);
+        }
+
+        .scanner-tips ul {
+            margin: 0.5rem 0 0 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .scanner-tips li {
+            margin: 0.25rem 0;
+        }
+
         #reader {
             max-width: 500px;
             margin: 0 auto;
@@ -625,7 +644,7 @@
 
     <script>
         // ⚠️ CONFIGURATION - REMPLACER PAR VOTRE URL GOOGLE APPS SCRIPT
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpOjqz3tI7NGxRvPEel-rPqaYdTE-MXxZYXGcUlWk_u9vlCU9Sa-LSUuGSoJfyvOmA/exec';
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
         
         let inventoryData = [];
         let html5QrCode = null;
@@ -660,7 +679,7 @@
                             <label for="serial">Numéro de série *</label>
                             <div style="display:flex;gap:10px;">
                                 <input type="text" id="serial" required placeholder="Scanner ou saisir" style="flex:1;">
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="startScanner()">📷</button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="startScanner()">📷 Scanner</button>
                             </div>
                         </div>
                     </div>
@@ -669,8 +688,17 @@
                         <input type="text" id="warranty" required placeholder="12/2025" pattern="(0[1-9]|1[0-2])/[0-9]{4}">
                     </div>
                     <div class="scanner-container" id="scanner-container" style="display:none;">
+                        <div class="scanner-tips">
+                            <strong>💡 Conseils pour un bon scan :</strong>
+                            <ul>
+                                <li>📸 Gardez le code-barres bien éclairé</li>
+                                <li>📏 Maintenez une distance de 10-20 cm</li>
+                                <li>🎯 Gardez l'appareil stable</li>
+                                <li>✅ Tous les types de codes sont supportés</li>
+                            </ul>
+                        </div>
                         <div id="reader"></div>
-                        <button type="button" class="btn btn-danger" onclick="stopScanner()" style="margin-top:1rem;">Arrêter</button>
+                        <button type="button" class="btn btn-danger" onclick="stopScanner()" style="margin-top:1rem;">❌ Arrêter le scanner</button>
                     </div>
                 `;
             } else if (type === 'Vidéoprojecteur') {
@@ -690,7 +718,7 @@
                             <label for="serial">Numéro de série *</label>
                             <div style="display:flex;gap:10px;">
                                 <input type="text" id="serial" required placeholder="Scanner ou saisir" style="flex:1;">
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="startScanner()">📷</button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="startScanner()">📷 Scanner</button>
                             </div>
                         </div>
                         <div class="form-group">
@@ -699,8 +727,17 @@
                         </div>
                     </div>
                     <div class="scanner-container" id="scanner-container" style="display:none;">
+                        <div class="scanner-tips">
+                            <strong>💡 Conseils pour un bon scan :</strong>
+                            <ul>
+                                <li>📸 Gardez le code-barres bien éclairé</li>
+                                <li>📏 Maintenez une distance de 10-20 cm</li>
+                                <li>🎯 Gardez l'appareil stable</li>
+                                <li>✅ Tous les types de codes sont supportés</li>
+                            </ul>
+                        </div>
                         <div id="reader"></div>
-                        <button type="button" class="btn btn-danger" onclick="stopScanner()" style="margin-top:1rem;">Arrêter</button>
+                        <button type="button" class="btn btn-danger" onclick="stopScanner()" style="margin-top:1rem;">❌ Arrêter le scanner</button>
                     </div>
                 `;
             } else if (type === 'ENI') {
@@ -713,21 +750,56 @@
         function startScanner() {
             document.getElementById('scanner-container').style.display = 'block';
             if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+            
+            // Configuration pour supporter TOUS les types de codes-barres et QR codes
+            const config = {
+                fps: 10,
+                qrbox: { width: 280, height: 180 },
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.QR_CODE,
+                    Html5QrcodeSupportedFormats.CODE_128,
+                    Html5QrcodeSupportedFormats.CODE_39,
+                    Html5QrcodeSupportedFormats.CODE_93,
+                    Html5QrcodeSupportedFormats.EAN_13,
+                    Html5QrcodeSupportedFormats.EAN_8,
+                    Html5QrcodeSupportedFormats.UPC_A,
+                    Html5QrcodeSupportedFormats.UPC_E,
+                    Html5QrcodeSupportedFormats.DATA_MATRIX,
+                    Html5QrcodeSupportedFormats.AZTEC,
+                    Html5QrcodeSupportedFormats.PDF_417,
+                    Html5QrcodeSupportedFormats.CODABAR,
+                    Html5QrcodeSupportedFormats.ITF
+                ],
+                aspectRatio: 1.777778
+            };
+            
             html5QrCode.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 150 } },
-                (text) => {
-                    document.getElementById('serial').value = text;
+                config,
+                (decodedText, result) => {
+                    document.getElementById('serial').value = decodedText;
                     stopScanner();
-                    showAlert('✅ Code scanné !', 'success');
+                    const preview = decodedText.length > 30 ? decodedText.substring(0, 30) + '...' : decodedText;
+                    showAlert('✅ Code scanné : ' + preview, 'success');
+                },
+                (errorMessage) => {
+                    // Erreurs de scan en cours - on les ignore
                 }
-            ).catch(() => showAlert('❌ Erreur caméra', 'danger'));
+            ).catch((err) => {
+                console.error('Erreur scanner:', err);
+                showAlert('❌ Erreur caméra. Vérifiez les autorisations.', 'danger');
+                document.getElementById('scanner-container').style.display = 'none';
+            });
         }
 
         function stopScanner() {
-            if (html5QrCode) html5QrCode.stop().then(() => {
-                document.getElementById('scanner-container').style.display = 'none';
-            });
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('scanner-container').style.display = 'none';
+                }).catch(err => {
+                    console.error('Erreur arrêt scanner:', err);
+                });
+            }
         }
 
         document.getElementById('equipment-form').addEventListener('submit', function(e) {
