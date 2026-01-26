@@ -657,6 +657,497 @@
 
     <script>
         // ⚠️ CONFIGURATION - REMPLACER PAR VOTRE URL GOOGLE APPS SCRIPT
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+        
+        let inventoryData = [];
+
+        document.addEventListener('DOMContentLoaded', loadData);
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+            if (tabName === 'room') populateRoomSelect();
+        }
+
+        function updateDynamicFields() {
+            const type = document.getElementById('type').value;
+            const container = document.getElementById('dynamic-fields');
+            
+            if (type === 'PC') {
+                container.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="brand">Marque *</label>
+                            <select id="brand" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="Lenovo">Lenovo</option>
+                                <option value="HP">HP</option>
+                                <option value="Autres">Autres</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="serial">Numéro de série *</label>
+                            <div style="display:flex;gap:10px;">
+                                <input type="text" id="serial" required placeholder="Scanner ou saisir" style="flex:1;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="startScanner()">📷 Scanner</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="warranty">Garantie (MM/AAAA) *</label>
+                        <input type="text" id="warranty" required placeholder="12/2025" pattern="(0[1-9]|1[0-2])/[0-9]{4}">
+                    </div>
+                    <div class="scanner-container" id="scanner-container" style="display:none;">
+                        <div class="scanner-tips">
+                            <strong>💡 Conseils pour un bon scan :</strong>
+                            <ul>
+                                <li>📸 Gardez le code-barres bien éclairé</li>
+                                <li>📏 Maintenez une distance de 10-20 cm</li>
+                                <li>🎯 Gardez l'appareil stable</li>
+                                <li>✅ QR codes ET codes-barres supportés</li>
+                            </ul>
+                        </div>
+                        <div id="reader"></div>
+                        <button type="button" class="btn btn-danger" onclick="stopScanner()" style="margin-top:1rem;">❌ Arrêter le scanner</button>
+                    </div>
+                `;
+            } else if (type === 'Vidéoprojecteur') {
+                container.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="brand">Marque *</label>
+                            <input type="text" id="brand" required placeholder="Epson">
+                        </div>
+                        <div class="form-group">
+                            <label for="model">Modèle *</label>
+                            <input type="text" id="model" required placeholder="EB-2250U">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="serial">Numéro de série *</label>
+                            <div style="display:flex;gap:10px;">
+                                <input type="text" id="serial" required placeholder="Scanner ou saisir" style="flex:1;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="startScanner()">📷 Scanner</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="warranty">Garantie (MM/AAAA) *</label>
+                            <input type="text" id="warranty" required placeholder="12/2025" pattern="(0[1-9]|1[0-2])/[0-9]{4}">
+                        </div>
+                    </div>
+                    <div class="scanner-container" id="scanner-container" style="display:none;">
+                        <div class="scanner-tips">
+                            <strong>💡 Conseils pour un bon scan :</strong>
+                            <ul>
+                                <li>📸 Gardez le code-barres bien éclairé</li>
+                                <li>📏 Maintenez une distance de 10-20 cm</li>
+                                <li>🎯 Gardez l'appareil stable</li>
+                                <li>✅ QR codes ET codes-barres supportés</li>
+                            </ul>
+                        </div>
+                        <div id="reader"></div>
+                        <button type="button" class="btn btn-danger" onclick="stopScanner()" style="margin-top:1rem;">❌ Arrêter le scanner</button>
+                    </div>
+                `;
+            } else if (type === 'ENI') {
+                container.innerHTML = '<div class="alert alert-success">ℹ️ Pour les ENI, seule la présence est enregistrée.</div>';
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
+        function startScanner() {
+            const container = document.getElementById('scanner-container');
+            container.style.display = 'block';
+            
+            // Variables pour la détection
+            let lastResult = null;
+            let sameResultCount = 0;
+            let scannerActive = false;
+            
+            // Fonction pour traiter un code détecté
+            function processCode(code, source) {
+                if (!code || code.length < 3) return;
+                
+                // Filtrage anti-faux positifs
+                if (lastResult === code) {
+                    sameResultCount++;
+                    if (sameResultCount >= 2) { // Confirmation après 2 détections
+                        if (scannerActive) {
+                            document.getElementById('serial').value = code;
+                            stopScanner();
+                            showAlert('✅ Code scanné (' + source + '): ' + code, 'success');
+                            lastResult = null;
+                            sameResultCount = 0;
+                        }
+                    }
+                } else {
+                    lastResult = code;
+                    sameResultCount = 1;
+                }
+            }
+            
+            // Configuration html5-qrcode pour QR codes (prioritaire)
+            const html5QrCode = new Html5Qrcode("reader");
+            
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0
+                },
+                (decodedText) => {
+                    processCode(decodedText, 'QR');
+                },
+                (errorMessage) => {
+                    // Ignorer les erreurs de scan silencieusement
+                }
+            ).then(() => {
+                scannerActive = true;
+                console.log("✅ Scanner QR démarré");
+                
+                // Démarrer AUSSI Quagga pour les codes-barres en parallèle
+                startBarcodeScanner();
+            }).catch(err => {
+                console.error('Erreur QR scanner:', err);
+                // Si QR échoue, essayer uniquement codes-barres
+                startBarcodeScanner();
+            });
+            
+            // Fonction pour démarrer le scanner de codes-barres
+            function startBarcodeScanner() {
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.querySelector('#reader'),
+                        constraints: {
+                            facingMode: "environment",
+                            width: { min: 640, ideal: 1280, max: 1920 },
+                            height: { min: 480, ideal: 720, max: 1080 }
+                        },
+                        area: {
+                            top: "15%",
+                            right: "10%",
+                            left: "10%",
+                            bottom: "15%"
+                        },
+                        singleChannel: false
+                    },
+                    locate: true,
+                    locator: {
+                        patchSize: "medium",
+                        halfSample: true
+                    },
+                    numOfWorkers: navigator.hardwareConcurrency || 4,
+                    frequency: 10,
+                    decoder: {
+                        readers: [
+                            "code_128_reader",
+                            "ean_reader",
+                            "ean_8_reader",
+                            "code_39_reader",
+                            "code_39_vin_reader",
+                            "codabar_reader",
+                            "upc_reader",
+                            "upc_e_reader",
+                            "i2of5_reader",
+                            "2of5_reader",
+                            "code_93_reader"
+                        ],
+                        multiple: false
+                    },
+                    debug: {
+                        drawBoundingBox: true,
+                        showFrequency: false,
+                        drawScanline: true,
+                        showPattern: false
+                    }
+                }, function(err) {
+                    if (err) {
+                        console.error('Erreur init Quagga:', err);
+                        if (!scannerActive) {
+                            showAlert('❌ Erreur caméra. Vérifiez les autorisations.', 'danger');
+                            container.style.display = 'none';
+                        }
+                        return;
+                    }
+                    
+                    console.log("✅ Scanner codes-barres démarré");
+                    Quagga.start();
+                    scannerActive = true;
+                });
+
+                // Détection codes-barres
+                Quagga.onDetected(function(result) {
+                    const code = result.codeResult.code;
+                    processCode(code, 'Barcode');
+                });
+            }
+        }
+
+        function stopScanner() {
+            try {
+                // Arrêter Quagga (codes-barres)
+                if (typeof Quagga !== 'undefined') {
+                    Quagga.stop();
+                    Quagga.offDetected();
+                }
+                
+                // Arrêter html5-qrcode (QR codes)
+                const readerElement = document.getElementById('reader');
+                if (readerElement) {
+                    // Vider complètement le contenu
+                    readerElement.innerHTML = '';
+                }
+                
+                document.getElementById('scanner-container').style.display = 'none';
+                console.log("✅ Scanners arrêtés");
+            } catch (err) {
+                console.error('Erreur arrêt scanner:', err);
+            }
+        }
+
+        document.getElementById('equipment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveEquipment();
+        });
+
+        async function saveEquipment() {
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Enregistrement...';
+            
+            const type = document.getElementById('type').value;
+            const equipment = {
+                id: Date.now(),
+                room: document.getElementById('room').value,
+                type: type,
+                state: document.getElementById('state').value,
+                notes: document.getElementById('notes').value,
+                dateAdded: new Date().toISOString()
+            };
+
+            if (type !== 'ENI') {
+                equipment.brand = document.getElementById('brand').value;
+                equipment.serial = document.getElementById('serial').value;
+                equipment.warranty = document.getElementById('warranty').value;
+                if (type === 'Vidéoprojecteur') {
+                    equipment.model = document.getElementById('model').value;
+                }
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'add', equipment: equipment })
+                });
+
+                showAlert('✅ Équipement enregistré et synchronisé !', 'success');
+                resetForm();
+                setTimeout(() => loadData(), 1000);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showAlert('❌ Erreur de synchronisation. Vérifiez votre connexion.', 'danger');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💾 Enregistrer';
+            }
+        }
+
+        async function loadData() {
+            setSyncStatus('syncing');
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=load');
+                const data = await response.json();
+                
+                if (Array.isArray(data)) {
+                    inventoryData = data;
+                    updateStats();
+                    displayTable();
+                    setSyncStatus('synced');
+                } else {
+                    throw new Error('Format de données invalide');
+                }
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+                showAlert('⚠️ Impossible de charger les données. Vérifiez la configuration.', 'warning');
+                setSyncStatus('error');
+            }
+        }
+
+        function setSyncStatus(status) {
+            const indicator = document.getElementById('sync-status');
+            if (status === 'syncing') {
+                indicator.className = 'sync-indicator syncing no-print';
+                indicator.textContent = '🔄 Synchronisation...';
+            } else if (status === 'synced') {
+                indicator.className = 'sync-indicator no-print';
+                indicator.textContent = '✅ Synchronisé';
+            } else {
+                indicator.className = 'sync-indicator syncing no-print';
+                indicator.textContent = '❌ Erreur';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('stat-pc').textContent = inventoryData.filter(i => i.type === 'PC').length;
+            document.getElementById('stat-vp').textContent = inventoryData.filter(i => i.type === 'Vidéoprojecteur').length;
+            document.getElementById('stat-eni').textContent = inventoryData.filter(i => i.type === 'ENI').length;
+            document.getElementById('stat-rooms').textContent = [...new Set(inventoryData.map(i => i.room))].length;
+        }
+
+        function displayTable() {
+            const tbody = document.getElementById('equipment-tbody');
+            if (inventoryData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><div class="empty-icon">📦</div><h3>Aucun équipement</h3></td></tr>';
+                return;
+            }
+            tbody.innerHTML = inventoryData.map(item => {
+                const badge = item.state === 'Fonctionnel' ? 'badge-success' : item.state === 'En panne' ? 'badge-danger' : 'badge-warning';
+                return `<tr>
+                    <td><strong>${item.room}</strong></td>
+                    <td>${item.type}</td>
+                    <td>${item.brand || '-'}</td>
+                    <td>${item.model || '-'}</td>
+                    <td>${item.serial || '-'}</td>
+                    <td>${item.warranty || '-'}</td>
+                    <td><span class="badge ${badge}">${item.state}</span></td>
+                    <td class="no-print"><button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">🗑️</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filterTable() {
+            const search = document.getElementById('filter-search').value.toLowerCase();
+            const type = document.getElementById('filter-type').value;
+            const state = document.getElementById('filter-state').value;
+            document.querySelectorAll('#equipment-tbody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) && (!type || text.includes(type.toLowerCase())) && (!state || text.includes(state.toLowerCase())) ? '' : 'none';
+            });
+        }
+
+        function populateRoomSelect() {
+            const rooms = [...new Set(inventoryData.map(i => i.room))].sort();
+            document.getElementById('room-select').innerHTML = '<option value="">-- Choisir --</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+        }
+
+        function loadRoomView() {
+            const room = document.getElementById('room-select').value;
+            const container = document.getElementById('room-details');
+            if (!room) {
+                container.innerHTML = '';
+                return;
+            }
+            const items = inventoryData.filter(i => i.room === room);
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Aucun équipement</p></div>';
+                return;
+            }
+            container.innerHTML = `<div style="margin-top:1.5rem;"><h3>Salle ${room}</h3><div class="table-wrapper" style="margin-top:1rem;"><table><thead><tr><th>Type</th><th>Marque</th><th>Modèle</th><th>N° Série</th><th>Garantie</th><th>État</th></tr></thead><tbody>${items.map(i => {
+                const badge = i.state === 'Fonctionnel' ? 'badge-success' : i.state === 'En panne' ? 'badge-danger' : 'badge-warning';
+                return `<tr><td>${i.type}</td><td>${i.brand||'-'}</td><td>${i.model||'-'}</td><td>${i.serial||'-'}</td><td>${i.warranty||'-'}</td><td><span class="badge ${badge}">${i.state}</span></td></tr>`;
+            }).join('')}</tbody></table></div></div>`;
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('Supprimer cet équipement ?')) return;
+            
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'delete', id: id })
+                });
+                
+                showAlert('✅ Équipement supprimé', 'success');
+                setTimeout(() => loadData(), 1000);
+            } catch (error) {
+                showAlert('❌ Erreur de suppression', 'danger');
+            }
+        }
+
+        function exportToExcel() {
+            if (inventoryData.length === 0) {
+                showAlert('❌ Aucune donnée', 'warning');
+                return;
+            }
+            
+            const data = inventoryData.map(i => ({
+                'Salle': i.room,
+                'Type': i.type,
+                'Marque': i.brand || '',
+                'Modèle': i.model || '',
+                'N° Série': i.serial || '',
+                'Garantie': i.warranty || '',
+                'État': i.state,
+                'Observations': i.notes || ''
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            ws['!cols'] = [
+                {wch: 10}, {wch: 18}, {wch: 12}, {wch: 15}, 
+                {wch: 20}, {wch: 12}, {wch: 15}, {wch: 30}
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Inventaire');
+            XLSX.writeFile(wb, `Inventaire_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showAlert('✅ Excel téléchargé !', 'success');
+        }
+
+        function resetForm() {
+            document.getElementById('equipment-form').reset();
+            document.getElementById('dynamic-fields').innerHTML = '';
+            stopScanner();
+        }
+
+        function showAlert(message, type) {
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.textContent = message;
+            document.getElementById('alert-container').appendChild(div);
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        // Auto-refresh toutes les 30 secondes
+        setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                loadData();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
+        </div>
+
+        <div id="tab-export" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">📊 Export & Impression</h2>
+                
+                <p style="color: var(--text-light); margin-bottom: 2rem;">
+                    Exportez l'inventaire au format Excel professionnel ou imprimez le document.
+                </p>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="exportToExcel()">📥 Exporter Excel</button>
+                    <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ CONFIGURATION - REMPLACER PAR VOTRE URL GOOGLE APPS SCRIPT
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpOjqz3tI7NGxRvPEel-rPqaYdTE-MXxZYXGcUlWk_u9vlCU9Sa-LSUuGSoJfyvOmA/exec';
         
         let inventoryData = [];
