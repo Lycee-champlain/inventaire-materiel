@@ -657,7 +657,7 @@
 
     <script>
         // ⚠️ CONFIGURATION - REMPLACER PAR VOTRE URL GOOGLE APPS SCRIPT
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpOjqz3tI7NGxRvPEel-rPqaYdTE-MXxZYXGcUlWk_u9vlCU9Sa-LSUuGSoJfyvOmA/exec';
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
         
         let inventoryData = [];
 
@@ -760,95 +760,57 @@
         }
 
         function startScanner() {
-    const container = document.getElementById('scanner-container');
-    container.style.display = 'block';
-    
-    // Configuration optimisée pour codes-barres Région + tous types
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#reader'),
-            constraints: {
-                facingMode: "environment",
-                width: { min: 640, ideal: 1280, max: 1920 },
-                height: { min: 480, ideal: 720, max: 1080 }
-            },
-            area: {
-                top: "15%",
-                right: "10%",
-                left: "10%",
-                bottom: "15%"
-            },
-            singleChannel: false
-        },
-        locate: true,
-        locator: {
-            patchSize: "medium",
-            halfSample: true
-        },
-        numOfWorkers: navigator.hardwareConcurrency || 4,
-        frequency: 10,
-        decoder: {
-            readers: [
-                "code_128_reader",
-                "ean_reader",
-                "ean_8_reader",
-                "code_39_reader",
-                "code_39_vin_reader",
-                "codabar_reader",
-                "upc_reader",
-                "upc_e_reader",
-                "i2of5_reader",
-                "2of5_reader",
-                "code_93_reader"
-            ],
-            multiple: false
-        },
-        debug: {
-            drawBoundingBox: true,
-            showFrequency: false,
-            drawScanline: true,
-            showPattern: false
-        }
-    }, function(err) {
-        if (err) {
-            console.error('Erreur init Quagga:', err);
-            showAlert('❌ Erreur caméra. Vérifiez les autorisations.', 'danger');
-            container.style.display = 'none';
-            return;
-        }
-        
-        console.log("✅ Quagga initialisé avec succès");
-        Quagga.start();
-    });
-
-    // Détection avec filtrage amélioré
-    let lastResult = null;
-    let sameResultCount = 0;
-    
-    Quagga.onDetected(function(result) {
-        const code = result.codeResult.code;
-        
-        // Filtrer les faux positifs
-        if (code && code.length >= 5) {
-            // Vérifier si c'est le même code détecté plusieurs fois
-            if (lastResult === code) {
-                sameResultCount++;
-                if (sameResultCount >= 2) { // Confirmation après 2 détections
-                    document.getElementById('serial').value = code;
-                    stopScanner();
-                    showAlert('✅ Code scanné : ' + code, 'success');
-                    lastResult = null;
-                    sameResultCount = 0;
+            const container = document.getElementById('scanner-container');
+            container.style.display = 'block';
+            
+            // Configuration OPTIMISÉE pour iPhone et tous codes-barres
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#reader'),
+                    constraints: {
+                        facingMode: "environment",
+                        width: { min: 640, ideal: 1280, max: 1920 },
+                        height: { min: 480, ideal: 720, max: 1080 }
+                    },
+                    area: {
+                        top: "15%",
+                        right: "10%",
+                        left: "10%",
+                        bottom: "15%"
+                    },
+                    singleChannel: false
+                },
+                locate: true,
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                numOfWorkers: navigator.hardwareConcurrency || 4,
+                frequency: 10,
+                decoder: {
+                    readers: [
+                        "code_128_reader",
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_39_reader",
+                        "code_39_vin_reader",
+                        "codabar_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "i2of5_reader",
+                        "2of5_reader",
+                        "code_93_reader"
+                    ],
+                    multiple: false
+                },
+                debug: {
+                    drawBoundingBox: true,
+                    showFrequency: false,
+                    drawScanline: true,
+                    showPattern: false
                 }
-            } else {
-                lastResult = code;
-                sameResultCount = 1;
-            }
-        }
-    });
-}
             }, function(err) {
                 if (err) {
                     console.error('Erreur init Quagga:', err);
@@ -856,16 +818,35 @@
                     container.style.display = 'none';
                     return;
                 }
+                
+                console.log("✅ Quagga initialisé avec succès");
                 Quagga.start();
             });
 
-            // Détection du code-barres
+            // Détection avec filtrage amélioré
+            let lastResult = null;
+            let sameResultCount = 0;
+            
             Quagga.onDetected(function(result) {
                 const code = result.codeResult.code;
-                document.getElementById('serial').value = code;
-                stopScanner();
-                const preview = code.length > 30 ? code.substring(0, 30) + '...' : code;
-                showAlert('✅ Code scanné : ' + preview, 'success');
+                
+                // Filtrer les faux positifs
+                if (code && code.length >= 5) {
+                    // Vérifier si c'est le même code détecté plusieurs fois
+                    if (lastResult === code) {
+                        sameResultCount++;
+                        if (sameResultCount >= 2) { // Confirmation après 2 détections
+                            document.getElementById('serial').value = code;
+                            stopScanner();
+                            showAlert('✅ Code scanné : ' + code, 'success');
+                            lastResult = null;
+                            sameResultCount = 0;
+                        }
+                    } else {
+                        lastResult = code;
+                        sameResultCount = 1;
+                    }
+                }
             });
         }
 
