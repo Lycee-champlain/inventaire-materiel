@@ -6,6 +6,7 @@
     <title>Inventaire Matériel - Lycée Samuel de Champlain</title>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -292,6 +293,18 @@
             margin: 0 auto;
             border-radius: 8px;
             overflow: hidden;
+            position: relative;
+        }
+
+        #reader video {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        #reader canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         .table-controls {
@@ -647,7 +660,6 @@
         const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
         
         let inventoryData = [];
-        let html5QrCode = null;
 
         document.addEventListener('DOMContentLoaded', loadData);
 
@@ -748,71 +760,80 @@
         }
 
         function startScanner() {
-            document.getElementById('scanner-container').style.display = 'block';
-            if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+            const container = document.getElementById('scanner-container');
+            container.style.display = 'block';
             
-            // Configuration ULTRA complète pour TOUS les codes-barres
-            const config = {
-                fps: 20,  // Augmenté pour plus de réactivité
-                qrbox: function(viewfinderWidth, viewfinderHeight) {
-                    // Zone de scan adaptative
-                    return {
-                        width: Math.min(viewfinderWidth * 0.9, 400),
-                        height: Math.min(viewfinderHeight * 0.6, 250)
-                    };
+            // Utiliser Quagga.js pour les codes-barres (meilleure détection)
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#reader'),
+                    constraints: {
+                        facingMode: "environment"
+                    },
+                    area: { // Zone de scan
+                        top: "20%",
+                        right: "10%",
+                        left: "10%",
+                        bottom: "20%"
+                    }
                 },
-                aspectRatio: 1.777778,
-                disableFlip: false,  // Essaie dans les deux sens
-                formatsToSupport: [
-                    Html5QrcodeSupportedFormats.QR_CODE,
-                    Html5QrcodeSupportedFormats.AZTEC,
-                    Html5QrcodeSupportedFormats.CODABAR,
-                    Html5QrcodeSupportedFormats.CODE_39,
-                    Html5QrcodeSupportedFormats.CODE_93,
-                    Html5QrcodeSupportedFormats.CODE_128,
-                    Html5QrcodeSupportedFormats.DATA_MATRIX,
-                    Html5QrcodeSupportedFormats.MAXICODE,
-                    Html5QrcodeSupportedFormats.ITF,
-                    Html5QrcodeSupportedFormats.EAN_13,
-                    Html5QrcodeSupportedFormats.EAN_8,
-                    Html5QrcodeSupportedFormats.PDF_417,
-                    Html5QrcodeSupportedFormats.RSS_14,
-                    Html5QrcodeSupportedFormats.RSS_EXPANDED,
-                    Html5QrcodeSupportedFormats.UPC_A,
-                    Html5QrcodeSupportedFormats.UPC_E,
-                    Html5QrcodeSupportedFormats.UPC_EAN_EXTENSION
-                ],
-                experimentalFeatures: {
-                    useBarCodeDetectorIfSupported: true  // Utilise l'API native si disponible
-                }
-            };
-            
-            html5QrCode.start(
-                { facingMode: "environment" },
-                config,
-                (decodedText, result) => {
-                    document.getElementById('serial').value = decodedText;
-                    stopScanner();
-                    const preview = decodedText.length > 30 ? decodedText.substring(0, 30) + '...' : decodedText;
-                    showAlert('✅ Code scanné : ' + preview, 'success');
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
                 },
-                (errorMessage) => {
-                    // Erreurs de scan en cours - on les ignore
+                numOfWorkers: 4,
+                frequency: 10,
+                decoder: {
+                    readers: [
+                        "code_128_reader",
+                        "code_39_reader",
+                        "code_39_vin_reader",
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_93_reader",
+                        "codabar_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "i2of5_reader"
+                    ],
+                    debug: {
+                        drawBoundingBox: true,
+                        showFrequency: true,
+                        drawScanline: true,
+                        showPattern: true
+                    }
+                },
+                locate: true
+            }, function(err) {
+                if (err) {
+                    console.error('Erreur init Quagga:', err);
+                    showAlert('❌ Erreur caméra. Vérifiez les autorisations.', 'danger');
+                    container.style.display = 'none';
+                    return;
                 }
-            ).catch((err) => {
-                console.error('Erreur scanner:', err);
-                showAlert('❌ Erreur caméra. Vérifiez les autorisations.', 'danger');
-                document.getElementById('scanner-container').style.display = 'none';
+                Quagga.start();
+            });
+
+            // Détection du code-barres
+            Quagga.onDetected(function(result) {
+                const code = result.codeResult.code;
+                document.getElementById('serial').value = code;
+                stopScanner();
+                const preview = code.length > 30 ? code.substring(0, 30) + '...' : code;
+                showAlert('✅ Code scanné : ' + preview, 'success');
             });
         }
 
         function stopScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    document.getElementById('scanner-container').style.display = 'none';
-                }).catch(err => {
-                    console.error('Erreur arrêt scanner:', err);
-                });
+            try {
+                if (typeof Quagga !== 'undefined') {
+                    Quagga.stop();
+                }
+                document.getElementById('scanner-container').style.display = 'none';
+            } catch (err) {
+                console.error('Erreur arrêt scanner:', err);
             }
         }
 
@@ -1012,7 +1033,7 @@
         function resetForm() {
             document.getElementById('equipment-form').reset();
             document.getElementById('dynamic-fields').innerHTML = '';
-            if (html5QrCode) stopScanner();
+            stopScanner();
         }
 
         function showAlert(message, type) {
