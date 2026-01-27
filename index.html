@@ -312,7 +312,6 @@
             border-left: 4px solid #28a745;
         }
 
-        /* Scanner modal */
         .modal {
             display: none;
             position: fixed;
@@ -385,7 +384,6 @@
             font-size: 16px;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
@@ -412,7 +410,6 @@
             }
         }
 
-        /* Print styles */
         @media print {
             body {
                 background: white;
@@ -510,7 +507,6 @@
         </div>
     </div>
 
-    <!-- Scanner Modal -->
     <div id="scannerModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -522,36 +518,24 @@
         </div>
     </div>
 
-    <!-- Quagga.js pour le scanner -->
     <script src="https://unpkg.com/@ericblade/quagga2/dist/quagga.min.js"></script>
 
     <script>
-        // ✅ Configuration de l'URL Apps Script
-        const SCRIPT_URL = <script>
-    // ✅ Configuration de l'URL Apps Script (UNE SEULE FOIS)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrif6FVRVDuxJtApLdgT5AI2dL6yBStSn1vfdURPBLnx0VeVgQjf-gfDRddHXB7CP9/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrif6FVRVDuxJtApLdgT5AI2dL6yBStSn1vfdURPBLnx0VeVgQjf-gfDRddHXB7CP9/exec";
 
-    // Variables globales
-    let allData = [];
-    let filteredData = [];
-    
-    // ... reste du code
-</script>
-
-        // Variables globales
         let allData = [];
         let filteredData = [];
 
-        // Chargement initial
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             setupSearchListener();
         });
 
-        // Fonction de chargement des données
         async function loadData() {
             try {
                 showLoading(true);
+                
+                console.log('🔍 Chargement depuis:', SCRIPT_URL);
                 
                 const response = await fetch(`${SCRIPT_URL}?action=load`);
                 
@@ -560,6 +544,7 @@
                 }
                 
                 const result = await response.json();
+                console.log('📦 Données reçues:', result);
                 
                 if (result.success) {
                     allData = result.data || [];
@@ -583,16 +568,14 @@
             }
         }
 
-        // Afficher/masquer le loading
         function showLoading(show) {
             document.getElementById('loadingState').style.display = show ? 'block' : 'none';
             document.getElementById('tableContainer').style.display = show ? 'none' : 'block';
         }
 
-        // Remplir les filtres
         function populateFilters() {
-            const types = [...new Set(allData.map(item => item.Type || item.type).filter(Boolean))];
-            const salles = [...new Set(allData.map(item => item.Salle || item.salle).filter(Boolean))];
+            const types = [...new Set(allData.map(item => item.type).filter(Boolean))];
+            const salles = [...new Set(allData.map(item => item.room).filter(Boolean))];
 
             const typeSelect = document.getElementById('filterType');
             const salleSelect = document.getElementById('filterSalle');
@@ -608,15 +591,13 @@
             });
         }
 
-        // Recherche en temps réel
         function setupSearchListener() {
             const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', (e) => {
+            searchInput.addEventListener('input', () => {
                 applyFilters();
             });
         }
 
-        // Appliquer les filtres
         function applyFilters() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const filterType = document.getElementById('filterType').value;
@@ -629,14 +610,9 @@
                         String(val).toLowerCase().includes(searchTerm)
                     );
                 
-                const matchType = !filterType || 
-                    (item.Type || item.type) === filterType;
-                
-                const matchSalle = !filterSalle || 
-                    (item.Salle || item.salle) === filterSalle;
-                
-                const matchEtat = !filterEtat || 
-                    (item.Etat || item.etat || item.État) === filterEtat;
+                const matchType = !filterType || item.type === filterType;
+                const matchSalle = !filterSalle || item.room === filterSalle;
+                const matchEtat = !filterEtat || item.state === filterEtat;
 
                 return matchSearch && matchType && matchSalle && matchEtat;
             });
@@ -645,7 +621,6 @@
             displayTable();
         }
 
-        // Réinitialiser les filtres
         function resetFilters() {
             document.getElementById('searchInput').value = '';
             document.getElementById('filterType').value = '';
@@ -654,17 +629,10 @@
             applyFilters();
         }
 
-        // Mettre à jour les statistiques
         function updateStats() {
-            const functional = filteredData.filter(item => 
-                (item.Etat || item.etat || item.État) === 'Fonctionnel'
-            ).length;
-            
-            const broken = filteredData.filter(item => 
-                (item.Etat || item.etat || item.État) === 'En panne'
-            ).length;
-            
-            const types = new Set(filteredData.map(item => item.Type || item.type).filter(Boolean));
+            const functional = filteredData.filter(item => item.state === 'Fonctionnel').length;
+            const broken = filteredData.filter(item => item.state === 'En panne').length;
+            const types = new Set(filteredData.map(item => item.type).filter(Boolean));
 
             document.getElementById('totalItems').textContent = filteredData.length;
             document.getElementById('functionalItems').textContent = functional;
@@ -672,7 +640,6 @@
             document.getElementById('uniqueTypes').textContent = types.size;
         }
 
-        // Afficher le tableau
         function displayTable() {
             const container = document.getElementById('tableContainer');
             
@@ -691,6 +658,19 @@
                 return;
             }
 
+            const columnMapping = {
+                'id': 'ID',
+                'room': 'Salle',
+                'type': 'Type',
+                'brand': 'Marque',
+                'model': 'Modèle',
+                'serial': 'N° Série',
+                'warranty': 'Garantie',
+                'state': 'État',
+                'notes': 'Notes',
+                'dateAdded': 'Date Ajout'
+            };
+
             const firstItem = filteredData[0];
             const headers = Object.keys(firstItem);
 
@@ -699,7 +679,9 @@
                     <table>
                         <thead>
                             <tr>
-                                ${headers.map(header => `<th>${header}</th>`).join('')}
+                                ${headers.map(header => 
+                                    `<th>${columnMapping[header] || header}</th>`
+                                ).join('')}
                             </tr>
                         </thead>
                         <tbody>
@@ -708,14 +690,20 @@
                                     ${headers.map(header => {
                                         let value = item[header] || '';
                                         
-                                        // Badge pour l'état
-                                        if (header === 'Etat' || header === 'etat' || header === 'État') {
+                                        if (header === 'state') {
                                             let badgeClass = 'badge-info';
                                             if (value === 'Fonctionnel') badgeClass = 'badge-success';
                                             else if (value === 'En panne') badgeClass = 'badge-danger';
                                             else if (value === 'En maintenance') badgeClass = 'badge-warning';
                                             
                                             return `<td><span class="badge ${badgeClass}">${value}</span></td>`;
+                                        }
+                                        
+                                        if (header === 'dateAdded' && value) {
+                                            try {
+                                                const date = new Date(value);
+                                                value = date.toLocaleDateString('fr-FR');
+                                            } catch(e) {}
                                         }
                                         
                                         return `<td>${value}</td>`;
@@ -730,7 +718,6 @@
             container.innerHTML = tableHTML;
         }
 
-        // Scanner de code-barres
         function openScanner() {
             const modal = document.getElementById('scannerModal');
             modal.classList.add('active');
@@ -778,21 +765,35 @@
             document.getElementById('scanner-result').innerHTML = '';
         }
 
-        // Export Excel
         function exportToExcel() {
             if (filteredData.length === 0) {
                 showError('Aucune donnée à exporter');
                 return;
             }
 
+            const columnMapping = {
+                'id': 'ID',
+                'room': 'Salle',
+                'type': 'Type',
+                'brand': 'Marque',
+                'model': 'Modèle',
+                'serial': 'N° Série',
+                'warranty': 'Garantie',
+                'state': 'État',
+                'notes': 'Notes',
+                'dateAdded': 'Date Ajout'
+            };
+
             const headers = Object.keys(filteredData[0]);
-            let csv = headers.join(',') + '\n';
+            const headersFr = headers.map(h => columnMapping[h] || h);
+            
+            let csv = headersFr.join(',') + '\n';
             
             filteredData.forEach(item => {
                 const row = headers.map(header => {
                     let value = item[header] || '';
-                    if (typeof value === 'string' && value.includes(',')) {
-                        value = `"${value}"`;
+                    if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                        value = `"${value.replace(/"/g, '""')}"`;
                     }
                     return value;
                 }).join(',');
@@ -814,7 +815,6 @@
             showSuccess('Export réussi !');
         }
 
-        // Messages
         function showError(message) {
             const container = document.getElementById('tableContainer');
             container.innerHTML = `
