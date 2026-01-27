@@ -384,6 +384,51 @@
             font-size: 16px;
         }
 
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
@@ -451,6 +496,9 @@
                 <button class="btn btn-success" onclick="exportToExcel()">
                     📊 Exporter Excel
                 </button>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    ➕ Ajouter du matériel
+                </button>
             </div>
 
             <div class="filters">
@@ -515,6 +563,68 @@
             </div>
             <div id="scanner-container"></div>
             <div id="scanner-result"></div>
+        </div>
+    </div>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajouter du matériel</h2>
+                <button class="close-btn" onclick="closeAddModal()">&times;</button>
+            </div>
+            <form id="addForm" onsubmit="submitAddForm(event)">
+                <div class="form-group">
+                    <label>Salle *</label>
+                    <input type="text" name="room" required placeholder="Ex: F000, A101...">
+                </div>
+                <div class="form-group">
+                    <label>Type *</label>
+                    <select name="type" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="PC">PC</option>
+                        <option value="Ordinateur portable">Ordinateur portable</option>
+                        <option value="Vidéoprojecteur">Vidéoprojecteur</option>
+                        <option value="Écran interactif">Écran interactif</option>
+                        <option value="Imprimante">Imprimante</option>
+                        <option value="Switch">Switch</option>
+                        <option value="Serveur">Serveur</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Marque *</label>
+                    <input type="text" name="brand" required placeholder="Ex: Dell, HP, Epson...">
+                </div>
+                <div class="form-group">
+                    <label>Modèle</label>
+                    <input type="text" name="model" placeholder="Ex: OptiPlex 7090">
+                </div>
+                <div class="form-group">
+                    <label>N° de Série *</label>
+                    <input type="text" name="serial" required placeholder="Ex: B0D9TRTL3F">
+                </div>
+                <div class="form-group">
+                    <label>Fin de garantie</label>
+                    <input type="date" name="warranty">
+                </div>
+                <div class="form-group">
+                    <label>État *</label>
+                    <select name="state" required>
+                        <option value="Fonctionnel" selected>Fonctionnel</option>
+                        <option value="En panne">En panne</option>
+                        <option value="En maintenance">En maintenance</option>
+                        <option value="Réformé">Réformé</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="3" placeholder="Remarques, observations..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Annuler</button>
+                    <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -836,6 +946,67 @@
             );
             
             setTimeout(() => container.remove(), 3000);
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('active');
+            document.getElementById('addForm').reset();
+        }
+
+        async function submitAddForm(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const newItem = {
+                id: Date.now().toString(),
+                room: formData.get('room'),
+                type: formData.get('type'),
+                brand: formData.get('brand'),
+                model: formData.get('model') || '',
+                serial: formData.get('serial'),
+                warranty: formData.get('warranty') || '',
+                state: formData.get('state'),
+                notes: formData.get('notes') || '',
+                dateAdded: new Date().toISOString()
+            };
+
+            try {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '⏳ Enregistrement...';
+
+                const response = await fetch(`${SCRIPT_URL}?action=add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newItem)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccess('Matériel ajouté avec succès !');
+                    closeAddModal();
+                    loadData(); // Recharger les données
+                } else {
+                    throw new Error(result.error || 'Erreur lors de l\'ajout');
+                }
+
+            } catch (error) {
+                console.error('❌ Erreur ajout:', error);
+                showError('Impossible d\'ajouter le matériel: ' + error.message);
+                
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '💾 Enregistrer';
+            }
         }
     </script>
 </body>
