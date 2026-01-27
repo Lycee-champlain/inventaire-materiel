@@ -527,7 +527,16 @@
 
     <script>
         // ✅ Configuration de l'URL Apps Script
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrif6FVRVDuxJtApLdgT5AI2dL6yBStSn1vfdURPBLnx0VeVgQjf-gfDRddHXB7CP9/exec";
+        const SCRIPT_URL = <script>
+    // ✅ Configuration de l'URL Apps Script (UNE SEULE FOIS)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrif6FVRVDuxJtApLdgT5AI2dL6yBStSn1vfdURPBLnx0VeVgQjf-gfDRddHXB7CP9/exec";
+
+    // Variables globales
+    let allData = [];
+    let filteredData = [];
+    
+    // ... reste du code
+</script>
 
         // Variables globales
         let allData = [];
