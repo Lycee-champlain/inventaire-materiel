@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventaire Matériel - Lycée Samuel de Champlain</title>
+    <title>Inventaire Matériel Informatique - Lycée Champlain</title>
     <style>
         * {
             margin: 0;
@@ -37,12 +37,6 @@
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
         }
 
         .controls {
@@ -51,27 +45,11 @@
             border-bottom: 2px solid #e9ecef;
         }
 
-        .search-box {
+        .btn-group {
             display: flex;
             gap: 15px;
             margin-bottom: 20px;
             flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex: 1;
-            min-width: 250px;
-            padding: 15px 20px;
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .btn {
@@ -97,16 +75,6 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-
         .btn-success {
             background: #28a745;
             color: white;
@@ -117,11 +85,39 @@
             transform: translateY(-2px);
         }
 
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
         .filters {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
-            align-items: center;
         }
 
         .filter-group {
@@ -167,7 +163,6 @@
             opacity: 0.9;
             margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .stat-card .number {
@@ -182,8 +177,6 @@
         .loading {
             text-align: center;
             padding: 50px;
-            font-size: 18px;
-            color: #6c757d;
         }
 
         .spinner {
@@ -201,16 +194,10 @@
             100% { transform: rotate(360deg); }
         }
 
-        .table-container {
-            overflow-x: auto;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            margin-top: 20px;
         }
 
         thead {
@@ -222,15 +209,6 @@
             padding: 15px;
             text-align: left;
             font-weight: 600;
-            text-transform: uppercase;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        thead th:hover {
-            background: rgba(255, 255, 255, 0.1);
         }
 
         tbody tr {
@@ -244,7 +222,6 @@
 
         tbody td {
             padding: 15px;
-            font-size: 14px;
         }
 
         .badge {
@@ -253,7 +230,6 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
-            text-transform: uppercase;
         }
 
         .badge-success {
@@ -269,47 +245,6 @@
         .badge-danger {
             background: #f8d7da;
             color: #721c24;
-        }
-
-        .badge-info {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
-        }
-
-        .empty-state svg {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .empty-state h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px;
-            border-left: 4px solid #dc3545;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px;
-            border-left: 4px solid #28a745;
         }
 
         .modal {
@@ -333,7 +268,7 @@
             background: white;
             padding: 30px;
             border-radius: 20px;
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
@@ -356,32 +291,10 @@
             font-size: 30px;
             cursor: pointer;
             color: #6c757d;
-            padding: 0;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .close-btn:hover {
             color: #dc3545;
-        }
-
-        #scanner-container {
-            width: 100%;
-            margin: 20px 0;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        #scanner-result {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            font-family: monospace;
-            font-size: 16px;
         }
 
         .form-group {
@@ -393,7 +306,6 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: #495057;
-            font-size: 14px;
         }
 
         .form-group input,
@@ -404,20 +316,13 @@
             border: 2px solid #dee2e6;
             border-radius: 8px;
             font-size: 14px;
-            font-family: inherit;
-            transition: all 0.3s;
         }
 
         .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .form-group select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
         }
 
         .form-actions {
@@ -429,17 +334,64 @@
             border-top: 2px solid #e9ecef;
         }
 
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #scanner-container {
+            width: 100%;
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .success-message, .error-message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
             }
 
-            .search-box {
+            .btn-group {
                 flex-direction: column;
-            }
-
-            .search-input {
-                min-width: 100%;
             }
 
             .stats {
@@ -449,25 +401,15 @@
             table {
                 font-size: 12px;
             }
-
-            tbody td, thead th {
-                padding: 10px 8px;
-            }
         }
 
         @media print {
             body {
                 background: white;
-                padding: 0;
             }
 
             .controls, .btn, .modal {
                 display: none !important;
-            }
-
-            .container {
-                box-shadow: none;
-                border-radius: 0;
             }
         }
     </style>
@@ -475,74 +417,66 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📦 Inventaire Matériel</h1>
-            <p>Lycée Samuel de Champlain - Gestion du matériel informatique</p>
+            <h1>📦 Inventaire Matériel Informatique</h1>
+            <p>Lycée Samuel de Champlain</p>
         </div>
 
         <div class="controls">
-            <div class="search-box">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    class="search-input" 
-                    placeholder="🔍 Rechercher par code, type, salle, marque..."
-                >
-                <button class="btn btn-primary" onclick="openScanner()">
-                    📷 Scanner Code-barres
-                </button>
-                <button class="btn btn-secondary" onclick="resetFilters()">
-                    🔄 Réinitialiser
-                </button>
-                <button class="btn btn-success" onclick="exportToExcel()">
-                    📊 Exporter Excel
-                </button>
-                <button class="btn btn-primary" onclick="openAddModal()">
-                    ➕ Ajouter du matériel
-                </button>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="openAddModal()">➕ Ajouter du matériel</button>
+                <button class="btn btn-success" onclick="exportExcel()">📊 Export Excel</button>
+                <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimer</button>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" id="searchInput" class="search-input" 
+                       placeholder="🔍 Rechercher par salle, type, marque, modèle, n° série...">
             </div>
 
             <div class="filters">
                 <div class="filter-group">
-                    <label>Type de matériel</label>
-                    <select id="filterType" class="filter-select" onchange="applyFilters()">
-                        <option value="">Tous les types</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Salle</label>
-                    <select id="filterSalle" class="filter-select" onchange="applyFilters()">
+                    <label>Filtrer par salle</label>
+                    <select id="filterRoom" class="filter-select" onchange="applyFilters()">
                         <option value="">Toutes les salles</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>État</label>
-                    <select id="filterEtat" class="filter-select" onchange="applyFilters()">
+                    <label>Filtrer par type</label>
+                    <select id="filterType" class="filter-select" onchange="applyFilters()">
+                        <option value="">Tous les types</option>
+                        <option value="PC">PC</option>
+                        <option value="Vidéoprojecteur">Vidéoprojecteur</option>
+                        <option value="ENI">ENI</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Filtrer par état</label>
+                    <select id="filterState" class="filter-select" onchange="applyFilters()">
                         <option value="">Tous les états</option>
                         <option value="Fonctionnel">Fonctionnel</option>
                         <option value="En panne">En panne</option>
-                        <option value="En maintenance">En maintenance</option>
-                        <option value="Réformé">Réformé</option>
+                        <option value="À remplacer">À remplacer</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <div class="stats" id="stats">
+        <div class="stats">
             <div class="stat-card">
-                <h3>Total Équipements</h3>
-                <div class="number" id="totalItems">0</div>
+                <h3>Total</h3>
+                <div class="number" id="totalCount">0</div>
             </div>
             <div class="stat-card">
-                <h3>Fonctionnels</h3>
-                <div class="number" id="functionalItems">0</div>
+                <h3>PC</h3>
+                <div class="number" id="pcCount">0</div>
             </div>
             <div class="stat-card">
-                <h3>En Panne</h3>
-                <div class="number" id="brokenItems">0</div>
+                <h3>Vidéoprojecteurs</h3>
+                <div class="number" id="vpCount">0</div>
             </div>
             <div class="stat-card">
-                <h3>Types</h3>
-                <div class="number" id="uniqueTypes">0</div>
+                <h3>ENI</h3>
+                <div class="number" id="eniCount">0</div>
             </div>
         </div>
 
@@ -551,462 +485,464 @@
                 <div class="spinner"></div>
                 <p>Chargement des données...</p>
             </div>
-            <div id="tableContainer" style="display: none;"></div>
+            <div id="dataContainer" style="display: none;"></div>
         </div>
     </div>
 
-    <div id="scannerModal" class="modal">
+    <!-- Modal Ajout/Édition -->
+    <div id="equipmentModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Scanner Code-barres</h2>
-                <button class="close-btn" onclick="closeScanner()">&times;</button>
+                <h2 id="modalTitle">Ajouter du matériel</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
-            <div id="scanner-container"></div>
-            <div id="scanner-result"></div>
-        </div>
-    </div>
-
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Ajouter du matériel</h2>
-                <button class="close-btn" onclick="closeAddModal()">&times;</button>
-            </div>
-            <form id="addForm" onsubmit="submitAddForm(event)">
+            <form id="equipmentForm" onsubmit="saveEquipment(event)">
+                <input type="hidden" id="equipmentId">
+                
                 <div class="form-group">
                     <label>Salle *</label>
-                    <input type="text" name="room" required placeholder="Ex: F000, A101...">
+                    <input type="text" id="room" required placeholder="Ex: F000, A101">
                 </div>
+
                 <div class="form-group">
-                    <label>Type *</label>
-                    <select name="type" required>
+                    <label>Type d'équipement *</label>
+                    <select id="type" required onchange="updateFormFields()">
                         <option value="">-- Sélectionner --</option>
                         <option value="PC">PC</option>
-                        <option value="Ordinateur portable">Ordinateur portable</option>
                         <option value="Vidéoprojecteur">Vidéoprojecteur</option>
-                        <option value="Écran interactif">Écran interactif</option>
-                        <option value="Imprimante">Imprimante</option>
-                        <option value="Switch">Switch</option>
-                        <option value="Serveur">Serveur</option>
-                        <option value="Autre">Autre</option>
+                        <option value="ENI">ENI (Écran Numérique Interactif)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Marque *</label>
-                    <input type="text" name="brand" required placeholder="Ex: Dell, HP, Epson...">
+
+                <div id="pcFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Marque *</label>
+                        <select id="pcBrand">
+                            <option value="Lenovo">Lenovo</option>
+                            <option value="HP">HP</option>
+                            <option value="Autres">Autres</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>N° de série *</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="pcSerial" placeholder="Saisir manuellement ou scanner" style="flex: 1;">
+                            <button type="button" class="btn btn-primary" onclick="openSerialScanner('pcSerial')">📷 Scanner</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Garantie (MM/AAAA)</label>
+                        <input type="month" id="pcWarranty">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Modèle</label>
-                    <input type="text" name="model" placeholder="Ex: OptiPlex 7090">
+
+                <div id="vpFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Marque *</label>
+                        <input type="text" id="vpBrand" placeholder="Ex: Epson, BenQ">
+                    </div>
+                    <div class="form-group">
+                        <label>Modèle *</label>
+                        <input type="text" id="vpModel" placeholder="Ex: EB-X41">
+                    </div>
+                    <div class="form-group">
+                        <label>N° de série *</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="vpSerial" placeholder="Saisir manuellement ou scanner" style="flex: 1;">
+                            <button type="button" class="btn btn-primary" onclick="openSerialScanner('vpSerial')">📷 Scanner</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Garantie (MM/AAAA)</label>
+                        <input type="month" id="vpWarranty">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>N° de Série *</label>
-                    <input type="text" name="serial" required placeholder="Ex: B0D9TRTL3F">
+
+                <div id="eniFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Présence ENI</label>
+                        <select id="eniPresent">
+                            <option value="Oui">Oui</option>
+                            <option value="Non">Non</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Fin de garantie</label>
-                    <input type="date" name="warranty">
-                </div>
+
                 <div class="form-group">
                     <label>État *</label>
-                    <select name="state" required>
-                        <option value="Fonctionnel" selected>Fonctionnel</option>
+                    <select id="state" required>
+                        <option value="Fonctionnel">Fonctionnel</option>
                         <option value="En panne">En panne</option>
-                        <option value="En maintenance">En maintenance</option>
-                        <option value="Réformé">Réformé</option>
+                        <option value="À remplacer">À remplacer</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label>Notes</label>
-                    <textarea name="notes" rows="3" placeholder="Remarques, observations..."></textarea>
+                    <textarea id="notes" rows="3" placeholder="Remarques, observations..."></textarea>
                 </div>
+
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Annuler</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                     <button type="submit" class="btn btn-success">💾 Enregistrer</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script src="https://unpkg.com/@ericblade/quagga2/dist/quagga.min.js"></script>
+    <!-- Modal Scanner -->
+    <div id="scannerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Scanner le code-barres du N° de série</h2>
+                <button class="close-btn" onclick="closeScanner()">&times;</button>
+            </div>
+            <div id="scanner-container"></div>
+            <p style="text-align: center; color: #6c757d; margin-top: 15px;">
+                Positionnez le code-barres devant la caméra
+            </p>
+        </div>
+    </div>
 
+    <script src="https://unpkg.com/@ericblade/quagga2/dist/quagga.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrif6FVRVDuxJtApLdgT5AI2dL6yBStSn1vfdURPBLnx0VeVgQjf-gfDRddHXB7CP9/exec";
-
+        
         let allData = [];
         let filteredData = [];
+        let editingId = null;
+        let currentSerialField = null; // Champ à remplir avec le scan
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
-            setupSearchListener();
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
         });
 
         async function loadData() {
             try {
                 showLoading(true);
-                
-                console.log('🔍 Chargement depuis:', SCRIPT_URL);
-                
                 const response = await fetch(`${SCRIPT_URL}?action=load`);
-                
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
-                }
-                
                 const result = await response.json();
-                console.log('📦 Données reçues:', result);
                 
                 if (result.success) {
                     allData = result.data || [];
                     filteredData = [...allData];
-                    
-                    console.log(`✅ ${allData.length} éléments chargés`);
-                    
                     populateFilters();
                     updateStats();
-                    displayTable();
-                    showSuccess(`${allData.length} équipements chargés avec succès`);
+                    displayData();
+                    showMessage('Données chargées avec succès', 'success');
                 } else {
-                    throw new Error(result.error || 'Erreur de chargement');
+                    throw new Error(result.error);
                 }
-                
-            } catch(error) {
-                console.error('❌ Erreur:', error);
-                showError('Impossible de charger les données: ' + error.message);
+            } catch (error) {
+                console.error('Erreur:', error);
+                showMessage('Erreur de chargement: ' + error.message, 'error');
             } finally {
                 showLoading(false);
             }
         }
 
-        function showLoading(show) {
-            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
-            document.getElementById('tableContainer').style.display = show ? 'none' : 'block';
-        }
-
         function populateFilters() {
-            const types = [...new Set(allData.map(item => item.type).filter(Boolean))];
-            const salles = [...new Set(allData.map(item => item.room).filter(Boolean))];
-
-            const typeSelect = document.getElementById('filterType');
-            const salleSelect = document.getElementById('filterSalle');
-
-            typeSelect.innerHTML = '<option value="">Tous les types</option>';
-            types.sort().forEach(type => {
-                typeSelect.innerHTML += `<option value="${type}">${type}</option>`;
-            });
-
-            salleSelect.innerHTML = '<option value="">Toutes les salles</option>';
-            salles.sort().forEach(salle => {
-                salleSelect.innerHTML += `<option value="${salle}">${salle}</option>`;
-            });
-        }
-
-        function setupSearchListener() {
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', () => {
-                applyFilters();
+            const rooms = [...new Set(allData.map(item => item.room).filter(Boolean))].sort();
+            const roomSelect = document.getElementById('filterRoom');
+            roomSelect.innerHTML = '<option value="">Toutes les salles</option>';
+            rooms.forEach(room => {
+                roomSelect.innerHTML += `<option value="${room}">${room}</option>`;
             });
         }
 
         function applyFilters() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filterType = document.getElementById('filterType').value;
-            const filterSalle = document.getElementById('filterSalle').value;
-            const filterEtat = document.getElementById('filterEtat').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const room = document.getElementById('filterRoom').value;
+            const type = document.getElementById('filterType').value;
+            const state = document.getElementById('filterState').value;
 
             filteredData = allData.filter(item => {
-                const matchSearch = !searchTerm || 
-                    Object.values(item).some(val => 
-                        String(val).toLowerCase().includes(searchTerm)
-                    );
-                
-                const matchType = !filterType || item.type === filterType;
-                const matchSalle = !filterSalle || item.room === filterSalle;
-                const matchEtat = !filterEtat || item.state === filterEtat;
+                const matchSearch = !search || Object.values(item).some(val =>
+                    String(val).toLowerCase().includes(search)
+                );
+                const matchRoom = !room || item.room === room;
+                const matchType = !type || item.type === type;
+                const matchState = !state || item.state === state;
 
-                return matchSearch && matchType && matchSalle && matchEtat;
+                return matchSearch && matchRoom && matchType && matchState;
             });
 
             updateStats();
-            displayTable();
-        }
-
-        function resetFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('filterType').value = '';
-            document.getElementById('filterSalle').value = '';
-            document.getElementById('filterEtat').value = '';
-            applyFilters();
+            displayData();
         }
 
         function updateStats() {
-            const functional = filteredData.filter(item => item.state === 'Fonctionnel').length;
-            const broken = filteredData.filter(item => item.state === 'En panne').length;
-            const types = new Set(filteredData.map(item => item.type).filter(Boolean));
-
-            document.getElementById('totalItems').textContent = filteredData.length;
-            document.getElementById('functionalItems').textContent = functional;
-            document.getElementById('brokenItems').textContent = broken;
-            document.getElementById('uniqueTypes').textContent = types.size;
+            document.getElementById('totalCount').textContent = filteredData.length;
+            document.getElementById('pcCount').textContent = filteredData.filter(i => i.type === 'PC').length;
+            document.getElementById('vpCount').textContent = filteredData.filter(i => i.type === 'Vidéoprojecteur').length;
+            document.getElementById('eniCount').textContent = filteredData.filter(i => i.type === 'ENI').length;
         }
 
-        function displayTable() {
-            const container = document.getElementById('tableContainer');
+        function displayData() {
+            const container = document.getElementById('dataContainer');
             
             if (filteredData.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
-                        <h3>Aucun équipement trouvé</h3>
-                        <p>Essayez de modifier vos critères de recherche</p>
-                    </div>
-                `;
+                container.innerHTML = '<p style="text-align:center;color:#6c757d;padding:40px;">Aucun équipement trouvé</p>';
                 return;
             }
 
-            const columnMapping = {
-                'id': 'ID',
-                'room': 'Salle',
-                'type': 'Type',
-                'brand': 'Marque',
-                'model': 'Modèle',
-                'serial': 'N° Série',
-                'warranty': 'Garantie',
-                'state': 'État',
-                'notes': 'Notes',
-                'dateAdded': 'Date Ajout'
-            };
+            // Grouper par salle
+            const byRoom = {};
+            filteredData.forEach(item => {
+                if (!byRoom[item.room]) byRoom[item.room] = [];
+                byRoom[item.room].push(item);
+            });
 
-            const firstItem = filteredData[0];
-            const headers = Object.keys(firstItem);
-
-            let tableHTML = `
-                <div class="table-container">
+            let html = '';
+            Object.keys(byRoom).sort().forEach(room => {
+                html += `
+                    <h3 style="margin: 30px 0 15px 0; color: #667eea;">📍 Salle ${room}</h3>
                     <table>
                         <thead>
                             <tr>
-                                ${headers.map(header => 
-                                    `<th>${columnMapping[header] || header}</th>`
-                                ).join('')}
+                                <th>Type</th>
+                                <th>Détails</th>
+                                <th>N° Série</th>
+                                <th>Garantie</th>
+                                <th>État</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${filteredData.map(item => `
-                                <tr>
-                                    ${headers.map(header => {
-                                        let value = item[header] || '';
-                                        
-                                        if (header === 'state') {
-                                            let badgeClass = 'badge-info';
-                                            if (value === 'Fonctionnel') badgeClass = 'badge-success';
-                                            else if (value === 'En panne') badgeClass = 'badge-danger';
-                                            else if (value === 'En maintenance') badgeClass = 'badge-warning';
-                                            
-                                            return `<td><span class="badge ${badgeClass}">${value}</span></td>`;
-                                        }
-                                        
-                                        if (header === 'dateAdded' && value) {
-                                            try {
-                                                const date = new Date(value);
-                                                value = date.toLocaleDateString('fr-FR');
-                                            } catch(e) {}
-                                        }
-                                        
-                                        return `<td>${value}</td>`;
-                                    }).join('')}
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            container.innerHTML = tableHTML;
-        }
-
-        function openScanner() {
-            const modal = document.getElementById('scannerModal');
-            modal.classList.add('active');
-            
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: document.querySelector('#scanner-container'),
-                    constraints: {
-                        width: 450,
-                        height: 300,
-                        facingMode: "environment"
-                    },
-                },
-                decoder: {
-                    readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "upc_reader"]
-                }
-            }, function(err) {
-                if (err) {
-                    console.error(err);
-                    showError('Impossible d\'accéder à la caméra');
-                    return;
-                }
-                Quagga.start();
-            });
-
-            Quagga.onDetected(function(result) {
-                const code = result.codeResult.code;
-                document.getElementById('scanner-result').innerHTML = `
-                    <strong>Code détecté:</strong> ${code}
                 `;
-                document.getElementById('searchInput').value = code;
-                
-                setTimeout(() => {
-                    closeScanner();
-                    applyFilters();
-                }, 1000);
-            });
-        }
 
-        function closeScanner() {
-            Quagga.stop();
-            document.getElementById('scannerModal').classList.remove('active');
-            document.getElementById('scanner-result').innerHTML = '';
-        }
-
-        function exportToExcel() {
-            if (filteredData.length === 0) {
-                showError('Aucune donnée à exporter');
-                return;
-            }
-
-            const columnMapping = {
-                'id': 'ID',
-                'room': 'Salle',
-                'type': 'Type',
-                'brand': 'Marque',
-                'model': 'Modèle',
-                'serial': 'N° Série',
-                'warranty': 'Garantie',
-                'state': 'État',
-                'notes': 'Notes',
-                'dateAdded': 'Date Ajout'
-            };
-
-            const headers = Object.keys(filteredData[0]);
-            const headersFr = headers.map(h => columnMapping[h] || h);
-            
-            let csv = headersFr.join(',') + '\n';
-            
-            filteredData.forEach(item => {
-                const row = headers.map(header => {
-                    let value = item[header] || '';
-                    if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-                        value = `"${value.replace(/"/g, '""')}"`;
+                byRoom[room].forEach(item => {
+                    let details = '';
+                    if (item.type === 'PC') {
+                        details = item.brand || '-';
+                    } else if (item.type === 'Vidéoprojecteur') {
+                        details = `${item.brand || '-'} ${item.model || ''}`;
+                    } else if (item.type === 'ENI') {
+                        details = item.present || 'Oui';
                     }
-                    return value;
-                }).join(',');
-                csv += row + '\n';
+
+                    let stateBadge = 'badge-success';
+                    if (item.state === 'En panne') stateBadge = 'badge-danger';
+                    if (item.state === 'À remplacer') stateBadge = 'badge-warning';
+
+                    html += `
+                        <tr>
+                            <td><strong>${item.type}</strong></td>
+                            <td>${details}</td>
+                            <td>${item.serial || '-'}</td>
+                            <td>${item.warranty || '-'}</td>
+                            <td><span class="badge ${stateBadge}">${item.state}</span></td>
+                            <td class="action-btns">
+                                <button class="btn btn-sm btn-warning" onclick='editEquipment(${JSON.stringify(item)})'>✏️ Modifier</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteEquipment('${item.id}')">🗑️ Supprimer</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
             });
 
-            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            
-            link.setAttribute('href', url);
-            link.setAttribute('download', `inventaire_${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showSuccess('Export réussi !');
-        }
-
-        function showError(message) {
-            const container = document.getElementById('tableContainer');
-            container.innerHTML = `
-                <div class="error-message">
-                    <strong>❌ Erreur:</strong> ${message}
-                </div>
-            `;
-            container.style.display = 'block';
-        }
-
-        function showSuccess(message) {
-            const container = document.createElement('div');
-            container.className = 'success-message';
-            container.innerHTML = `<strong>✅ Succès:</strong> ${message}`;
-            
-            document.querySelector('.content').insertBefore(
-                container, 
-                document.getElementById('tableContainer')
-            );
-            
-            setTimeout(() => container.remove(), 3000);
+            container.innerHTML = html;
         }
 
         function openAddModal() {
-            document.getElementById('addModal').classList.add('active');
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Ajouter du matériel';
+            document.getElementById('equipmentForm').reset();
+            document.getElementById('equipmentId').value = '';
+            document.getElementById('equipmentModal').classList.add('active');
         }
 
-        function closeAddModal() {
-            document.getElementById('addModal').classList.remove('active');
-            document.getElementById('addForm').reset();
+        function editEquipment(item) {
+            editingId = item.id;
+            document.getElementById('modalTitle').textContent = 'Modifier l\'équipement';
+            document.getElementById('equipmentId').value = item.id;
+            document.getElementById('room').value = item.room;
+            document.getElementById('type').value = item.type;
+            document.getElementById('state').value = item.state;
+            document.getElementById('notes').value = item.notes || '';
+
+            updateFormFields();
+
+            if (item.type === 'PC') {
+                document.getElementById('pcBrand').value = item.brand || 'Lenovo';
+                document.getElementById('pcSerial').value = item.serial || '';
+                document.getElementById('pcWarranty').value = item.warranty || '';
+            } else if (item.type === 'Vidéoprojecteur') {
+                document.getElementById('vpBrand').value = item.brand || '';
+                document.getElementById('vpModel').value = item.model || '';
+                document.getElementById('vpSerial').value = item.serial || '';
+                document.getElementById('vpWarranty').value = item.warranty || '';
+            } else if (item.type === 'ENI') {
+                document.getElementById('eniPresent').value = item.present || 'Oui';
+            }
+
+            document.getElementById('equipmentModal').classList.add('active');
         }
 
-        async function submitAddForm(event) {
+        function updateFormFields() {
+            const type = document.getElementById('type').value;
+            document.getElementById('pcFields').style.display = type === 'PC' ? 'block' : 'none';
+            document.getElementById('vpFields').style.display = type === 'Vidéoprojecteur' ? 'block' : 'none';
+            document.getElementById('eniFields').style.display = type === 'ENI' ? 'block' : 'none';
+        }
+
+        async function saveEquipment(event) {
             event.preventDefault();
-            
-            const form = event.target;
-            const formData = new FormData(form);
-            
-            const newItem = {
-                id: Date.now().toString(),
-                room: formData.get('room'),
-                type: formData.get('type'),
-                brand: formData.get('brand'),
-                model: formData.get('model') || '',
-                serial: formData.get('serial'),
-                warranty: formData.get('warranty') || '',
-                state: formData.get('state'),
-                notes: formData.get('notes') || '',
-                dateAdded: new Date().toISOString()
+
+            const type = document.getElementById('type').value;
+            const equipment = {
+                id: editingId || Date.now().toString(),
+                room: document.getElementById('room').value,
+                type: type,
+                state: document.getElementById('state').value,
+                notes: document.getElementById('notes').value
             };
 
-            try {
-                const submitBtn = form.querySelector('button[type="submit"]');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '⏳ Enregistrement...';
+            if (type === 'PC') {
+                equipment.brand = document.getElementById('pcBrand').value;
+                equipment.serial = document.getElementById('pcSerial').value;
+                equipment.warranty = document.getElementById('pcWarranty').value;
+            } else if (type === 'Vidéoprojecteur') {
+                equipment.brand = document.getElementById('vpBrand').value;
+                equipment.model = document.getElementById('vpModel').value;
+                equipment.serial = document.getElementById('vpSerial').value;
+                equipment.warranty = document.getElementById('vpWarranty').value;
+            } else if (type === 'ENI') {
+                equipment.present = document.getElementById('eniPresent').value;
+            }
 
-                const response = await fetch(`${SCRIPT_URL}?action=add`, {
+            try {
+                const action = editingId ? 'update' : 'add';
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(newItem)
+                    body: JSON.stringify({ action, equipment })
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    showSuccess('Matériel ajouté avec succès !');
-                    closeAddModal();
-                    loadData(); // Recharger les données
+                    showMessage(editingId ? 'Équipement modifié' : 'Équipement ajouté', 'success');
+                    closeModal();
+                    loadData();
                 } else {
-                    throw new Error(result.error || 'Erreur lors de l\'ajout');
+                    throw new Error(result.error);
                 }
-
             } catch (error) {
-                console.error('❌ Erreur ajout:', error);
-                showError('Impossible d\'ajouter le matériel: ' + error.message);
-                
-                const submitBtn = form.querySelector('button[type="submit"]');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '💾 Enregistrer';
+                showMessage('Erreur: ' + error.message, 'error');
             }
+        }
+
+        async function deleteEquipment(id) {
+            if (!confirm('Supprimer cet équipement ?')) return;
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'delete', id })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Équipement supprimé', 'success');
+                    loadData();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showMessage('Erreur: ' + error.message, 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('equipmentModal').classList.remove('active');
+            editingId = null;
+        }
+
+        function openSerialScanner(fieldId) {
+            currentSerialField = fieldId;
+            document.getElementById('scannerModal').classList.add('active');
+            
+            Quagga.init({
+                inputStream: {
+                    type: "LiveStream",
+                    target: document.querySelector('#scanner-container'),
+                    constraints: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "environment"
+                    }
+                },
+                decoder: {
+                    readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "upc_reader", "code_39_vin_reader"]
+                }
+            }, (err) => {
+                if (err) {
+                    console.error(err);
+                    showMessage('Impossible d\'accéder à la caméra', 'error');
+                    closeScanner();
+                    return;
+                }
+                Quagga.start();
+            });
+
+            Quagga.onDetected((result) => {
+                const code = result.codeResult.code;
+                
+                // Remplir le champ avec le code scanné
+                if (currentSerialField) {
+                    document.getElementById(currentSerialField).value = code;
+                    showMessage('Code-barres scanné: ' + code, 'success');
+                }
+                
+                closeScanner();
+            });
+        }
+
+        function closeScanner() {
+            try {
+                Quagga.stop();
+            } catch(e) {
+                // Ignore les erreurs si Quagga n'est pas démarré
+            }
+            document.getElementById('scannerModal').classList.remove('active');
+            currentSerialField = null;
+        }
+
+        function exportExcel() {
+            const wb = XLSX.utils.book_new();
+            
+            // Feuille par type
+            ['PC', 'Vidéoprojecteur', 'ENI'].forEach(type => {
+                const items = allData.filter(i => i.type === type);
+                if (items.length > 0) {
+                    const ws = XLSX.utils.json_to_sheet(items);
+                    XLSX.utils.book_append_sheet(wb, ws, type);
+                }
+            });
+
+            // Export
+            XLSX.writeFile(wb, `Inventaire_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showMessage('Export Excel réussi', 'success');
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+            document.getElementById('dataContainer').style.display = show ? 'none' : 'block';
+        }
+
+        function showMessage(text, type) {
+            const className = type === 'success' ? 'success-message' : 'error-message';
+            const msg = document.createElement('div');
+            msg.className = className;
+            msg.textContent = text;
+            document.querySelector('.content').insertBefore(msg, document.getElementById('dataContainer'));
+            setTimeout(() => msg.remove(), 3000);
         }
     </script>
 </body>
