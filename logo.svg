@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="120" fill="#1e40af"/>
+  
+  <!-- Box/Package Icon -->
+  <g transform="translate(100, 100)">
+    <!-- Box body -->
+    <rect x="50" y="80" width="212" height="180" fill="#3b82f6" stroke="#ffffff" stroke-width="8" rx="8"/>
+    
+    <!-- Box top flap left -->
+    <path d="M 50 80 L 156 20 L 156 80 Z" fill="#60a5fa" stroke="#ffffff" stroke-width="8"/>
+    
+    <!-- Box top flap right -->
+    <path d="M 262 80 L 156 20 L 156 80 Z" fill="#2563eb" stroke="#ffffff" stroke-width="8"/>
+    
+    <!-- Box side -->
+    <path d="M 262 80 L 312 110 L 312 290 L 262 260 Z" fill="#1e3a8a" stroke="#ffffff" stroke-width="8"/>
+    
+    <!-- Center line decoration -->
+    <line x1="156" y1="80" x2="156" y2="260" stroke="#ffffff" stroke-width="8" stroke-dasharray="20,15"/>
+    
+    <!-- Label/Badge on box -->
+    <rect x="90" y="140" width="132" height="60" fill="#ffffff" rx="8" opacity="0.9"/>
+    <text x="156" y="175" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#1e40af" text-anchor="middle">INV</text>
+  </g>
+  
+  <!-- Bottom text -->
+  <text x="256" y="450" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#ffffff" text-anchor="middle">LYCÉE</text>
+</svg>
